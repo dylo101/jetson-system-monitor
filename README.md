@@ -44,3 +44,15 @@ http://127.0.0.1:8000/docs to explore the API.
 no CPU-labelled sensor is available. Failed collection retains the previous
 reading and marks health degraded. Before the first successful sample, current
 metrics returns 503. Run only one API worker so there is only one sampler.
+
+## History
+
+`GET /api/metrics/history` returns the last hour of stored samples (up to 720).
+Optional `from` and `to` parameters accept ISO timestamps with a timezone, and
+`limit` accepts 1–2000. Results contain the newest matching samples in ascending
+time order. Invalid ranges return HTTP 422.
+
+`DATABASE_PATH` overrides the default `backend/data/metrics.sqlite3`. A successful
+sample is saved before it appears in the current endpoint. Each write removes
+samples older than 24 hours and caps the table at 20,000 rows. SQLite reuses freed
+pages rather than immediately shrinking its file. Databases are excluded from Git.

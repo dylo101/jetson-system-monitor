@@ -19,3 +19,12 @@
 - Published checkpoint 1 using the machine's existing SSH key. HTTPS lacked
   credentials, and the connected GitHub app denied write access.
 - Historical storage and the browser dashboard remain pending.
+
+## Checkpoint 3 — Persistent history
+
+- Added a SQLite repository with UTC timestamps, parameterized range queries,
+  24-hour retention, and a 20,000-row safety cap.
+- Added a history endpoint with timezone, ordering, and result-limit validation.
+- Expanded the test suite: nine tests passed in 2.35 seconds, including API
+  restart persistence, database range/order behavior, retention, and row limits.
+- Browser integration remains pending. The TestClient dependency warning remains.
