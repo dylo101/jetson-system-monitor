@@ -22,3 +22,25 @@ docs/            Architecture and evidence of progress
 
 The prototype is separate from other host applications and collects only ordinary
 system metrics. Development servers will bind to loopback.
+
+## Backend setup
+
+From the repository root (Python 3.10+ required):
+
+```bash
+python3 -m venv backend/.venv
+backend/.venv/bin/pip install -e './backend[dev]'
+cd backend
+.venv/bin/pytest -q
+.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+
+The virtual environment keeps Python dependencies local to this project. Pytest
+checks behavior; Uvicorn runs the API until you press Ctrl+C. Open
+http://127.0.0.1:8000/docs to explore the API.
+
+`SAMPLE_INTERVAL_SECONDS` controls the pause between samples (default 5, allowed
+1–3600). CPU readings measure a short 0.1-second window. Temperature is null when
+no CPU-labelled sensor is available. Failed collection retains the previous
+reading and marks health degraded. Before the first successful sample, current
+metrics returns 503. Run only one API worker so there is only one sampler.
