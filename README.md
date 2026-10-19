@@ -56,3 +56,45 @@ time order. Invalid ranges return HTTP 422.
 sample is saved before it appears in the current endpoint. Each write removes
 samples older than 24 hours and caps the table at 20,000 rows. SQLite reuses freed
 pages rather than immediately shrinking its file. Databases are excluded from Git.
+
+## Dashboard setup
+
+With the backend running, open another terminal at the repository root. Requires
+Node 20.19+ or 22.12+ (Node 24 is supported).
+
+```bash
+cd frontend
+npm ci
+npm run dev
+```
+
+Open http://127.0.0.1:5173 on the machine running the servers. Vite serves the
+frontend and proxies `/api` requests to the backend at port 8000. Stop either
+server with Ctrl+C; these are development processes, not persistent services.
+
+For a browser on your own computer connected to the Jetson by SSH:
+
+```bash
+ssh -L 5173:127.0.0.1:5173 -L 8000:127.0.0.1:8000 YOUR_USER@YOUR_JETSON
+```
+
+Then open the same localhost URL on your computer. This forwards loopback ports
+without exposing development servers on the network.
+
+To check TypeScript and build frontend assets, run `npm run build` from `frontend/`.
+The dashboard refreshes every five seconds and shows current cards plus a CPU
+history chart. It retains previous readings during connection failures and marks
+samples stale after three sampling intervals (at least 15 seconds). Loading,
+empty-history, and unsupported-temperature states have dedicated messages.
+
+## Understand the code
+
+Read `backend/app/models.py` → `metrics.py` → `db.py` → `main.py`, then
+`frontend/src/main.tsx`. See [the walkthrough](docs/architecture.md) and
+[the progress log](docs/progress-log.md).
+
+The prototype has no GPU metrics, authentication, production hosting, CI, or
+Docker packaging. The frontend build checks types and packaging; it is not an
+automated browser test. Backend tests use temporary databases and fake readings.
+The current dependency versions emit a TestClient/httpx deprecation warning;
+the tests still run successfully. Initial code was generated with Codex assistance.
